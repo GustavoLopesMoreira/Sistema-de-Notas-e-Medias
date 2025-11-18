@@ -1,17 +1,50 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <locale.h>
 
-int main()
-{
-    int a, n, x, y;
-    double soma, nota;
-    double maiorNota, menorNota, mediaTurma, somaDasMedias = 0;
+typedef struct { // cria um struct para agrupar cada aluno com sua nota
 
-    // Variáveis para ordenação
-    char tempNome[50];
-    double tempMedia;
-    int i, j;
+    char nome[50];
+    double media;
+} Aluno;
+
+double maiorNota(Aluno alunos[], int a) { // Define a maior nota
+
+    double maior = alunos[0].media;
+
+    for (int x = 1; x < a; x++) {
+        if (alunos[x].media > maior) {
+            maior = alunos[x].media;
+        }
+    }
+    return maior;
+}
+
+double menorNota(Aluno alunos[], int a) { // Define a menor nota
+
+    double menor = alunos[0].media;
+
+    for (int x = 1; x < a; x++) {
+        if (alunos[x].media < menor) {
+            menor = alunos[x].media;
+        }
+    }
+    return menor;
+}
+
+int compararAlunos(const void *a, const void *b) { // Compara os alunos e organiza em ordem alfabetica
+
+    const Aluno *al1 = (const Aluno *)a;
+    const Aluno *al2 = (const Aluno *)b;
+
+    return strcmp(al1->nome, al2->nome);
+}
+
+int main() {
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+    int a, n;
+    double nota, soma, somaDasMedias = 0;
 
     printf("Quantidade de alunos na turma: ");
     scanf("%d", &a);
@@ -19,90 +52,47 @@ int main()
     printf("Quantidade de avaliações: ");
     scanf("%d", &n);
 
-    char nomes[a][50];
-    double medias[a];
+    Aluno alunos[a];
 
-    for (x = 0; x < a; x++) // Nome dos alunos
-    {
-        getchar(); // Limpa o Buffer
-        printf("\nNome do aluno %d: ", x + 1);
-        fgets(nomes[x], 50, stdin);
-        nomes[x][strcspn(nomes[x], "\n")] = '\0'; // troca o \n por \0 para não quebrar a linha
+    for (int i = 0; i < a; i++) {
+
+        while (getchar() != '\n'); // Limpa buffer antes de ler o nome
+
+        printf("\nNome do aluno %d: ", i + 1);
+        fgets(alunos[i].nome, 50, stdin);
+        alunos[i].nome[strcspn(alunos[i].nome, "\n")] = '\0';
 
         soma = 0;
 
-        for (y = 0; y < n; y++) // Notas
-        {
-            printf("Digite a %dª nota: ", y + 1);
+        for (int j = 0; j < n; j++) {
+            printf("Digite a %dª nota: ", j + 1);
             scanf("%lf", &nota);
-            soma = soma + nota;
+            soma += nota;
         }
 
-        medias[x] = soma / n;
-        somaDasMedias = somaDasMedias + medias[x];
-
-        if (x == 0)// Define o primeiro aluno como marco inicial
-        { 
-
-            maiorNota = medias[x];
-            menorNota = medias[x];
-        }
-        else
-        {
-            if (medias[x] > maiorNota)
-            {
-                maiorNota = medias[x];
-            }
-            if (medias[x] < menorNota)
-            {
-                menorNota = medias[x];
-            }
-        }
+        alunos[i].media = soma / n;
+        somaDasMedias += alunos[i].media;
     }
 
-    for (i = 0; i < a - 1; i++)// Ordena os nomes em ordem alfabética
-    { 
-        for (j = i + 1; j < a; j++)
-        {
+    qsort(alunos, a, sizeof(Aluno), compararAlunos); // Ordena os nomes 
 
-            if (strcmp(nomes[i], nomes[j]) > 0)// Checa se o nome precisa ser trocado
-            { 
+    printf("\n Lista de alunos  \n");
 
-                // Troca os Nomes usando strcpy e variável temporária
-                strcpy(tempNome, nomes[i]);
-                strcpy(nomes[i], nomes[j]);
-                strcpy(nomes[j], tempNome);
-
-                // Troca a média x para acompanhar o aluno x
-                tempMedia = medias[i];
-                medias[i] = medias[j];
-                medias[j] = tempMedia;
-            }
-        }
+    for (int i = 0; i < a; i++) {
+        
+        printf("Nome: %-10s | Media: %.2lf | %s\n",
+            alunos[i].nome,
+            alunos[i].media,
+            alunos[i].media >= 6 ? "Aprovado" : "Reprovado"
+        );
     }
 
-    printf("\n--- Lista de alunos ---\n");
+    double mediaTurma = somaDasMedias / a;
 
-    for (x = 0; x < a; x++)
-    {
-        printf("Nome: %-10s | Media: %.2lf | ", nomes[x], medias[x]);
-
-        if (medias[x] >= 6)
-        {
-            printf("Aprovado.\n");
-        }
-        else
-        {
-            printf("Reprovado.\n");
-        }
-    }
-
-    mediaTurma = somaDasMedias / a;
-
-    printf("\n--- Estatisticas da turma ---\n");
-    printf("Media da turma: %.2lf\n", mediaTurma);
-    printf("Maior nota: %.2lf\n", maiorNota);
-    printf("Menor nota: %.2lf\n", menorNota);
+    printf("\n Estatísticas da turma \n");
+    printf("Média da turma: %.2lf\n", mediaTurma);
+    printf("Maior média: %.2lf\n", maiorNota(alunos, a));
+    printf("Menor média: %.2lf\n", menorNota(alunos, a));
 
     return 0;
 }
