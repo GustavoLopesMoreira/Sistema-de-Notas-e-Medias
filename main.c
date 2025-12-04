@@ -90,7 +90,7 @@ int main() {
             }
         }
 
-        if (turma[i].media >= 7) {
+        if (turma[i].media >= 6) {
             printf("| Aprovado\n");
         } else {
             printf("| Reprovado\n");
