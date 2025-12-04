@@ -67,7 +67,8 @@ int main() {
     for (int x = 0; x < quantidadeAlunos - 1; x++) {
         for (int y = 0; y < quantidadeAlunos - x - 1; y++) {
             
-            if (strcmp(turma[y].nome, turma[y + 1].nome) > 0) { // Compara os nomes e quando for ordenar, troca o bloco inteiro(Nome, notas e medias)
+            if (strcmp(turma[y].nome, turma[y + 1].nome) > 0) { 
+         // Compara os nomes e quando for ordenar, //troca o bloco inteiro(Nome, notas e medias)
 
                 temp = turma[y];
                 turma[y] = turma[y + 1];
